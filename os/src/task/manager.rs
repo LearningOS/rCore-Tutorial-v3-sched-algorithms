@@ -1,25 +1,47 @@
 use super::{ProcessControlBlock, TaskControlBlock};
 use crate::sync::UPSafeCell;
+use crate::config::MLFQ_PRIORITY;
 use alloc::collections::{BTreeMap, VecDeque};
 use alloc::sync::Arc;
+use k210_hal::cache::Uncache;
 use lazy_static::*;
 
 pub struct TaskManager {
-    ready_queue: VecDeque<Arc<TaskControlBlock>>,
+    ready_queue: VecDeque<VecDeque<Arc<TaskControlBlock>>>,
 }
 
-/// A simple FIFO scheduler.
+/// A MLFQ scheduler.
 impl TaskManager {
     pub fn new() -> Self {
+        let mut mlfq = VecDeque::with_capacity(MLFQ_PRIORITY);
+        let mut tmp = 0;
+        while tmp < MLFQ_PRIORITY {
+            mlfq.push_back(VecDeque::new());
+            tmp += 1;
+        }
         Self {
-            ready_queue: VecDeque::new(),
+            ready_queue: mlfq
         }
     }
     pub fn add(&mut self, task: Arc<TaskControlBlock>) {
-        self.ready_queue.push_back(task);
+        let mut task_inner = task.inner_exclusive_access();
+        let priority = task_inner.task_priority;
+        drop(task_inner);
+        if priority == 0{
+            self.ready_queue.get_mut(0).unwrap().push_back(task);
+        }
+        else{
+            self.ready_queue.get_mut(priority - 1).unwrap().push_back(task);
+        }
     }
     pub fn fetch(&mut self) -> Option<Arc<TaskControlBlock>> {
-        self.ready_queue.pop_front()
+        for queue in (0..MLFQ_PRIORITY).rev(){
+            let mlfq = self.ready_queue.get_mut(queue).unwrap();
+            if !mlfq.is_empty() {
+                return mlfq.pop_front();
+            }
+        }
+        self.ready_queue.get_mut(MLFQ_PRIORITY - 1).unwrap().pop_front()
     }
 }
 
