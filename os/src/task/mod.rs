@@ -8,7 +8,7 @@ mod switch;
 #[allow(clippy::module_inception)]
 mod task;
 
-use crate::{fs::{open_file, OpenFlags}, timer::get_time_ms};
+use crate::fs::{open_file, OpenFlags};
 use alloc::sync::Arc;
 use lazy_static::*;
 use manager::fetch_task;
@@ -34,8 +34,6 @@ pub fn suspend_current_and_run_next() {
     let task_cx_ptr = &mut task_inner.task_cx as *mut TaskContext;
     // Change status to Ready
     task_inner.task_status = TaskStatus::Ready;
-    task_inner.task_prediction = get_time_ms() - task_inner.task_start;
-    task_inner.task_start = get_time_ms();
     drop(task_inner);
     // ---- release current TCB
 
@@ -50,8 +48,6 @@ pub fn block_current_and_run_next() {
     let mut task_inner = task.inner_exclusive_access();
     let task_cx_ptr = &mut task_inner.task_cx as *mut TaskContext;
     task_inner.task_status = TaskStatus::Blocking;
-    task_inner.task_prediction = get_time_ms() - task_inner.task_start;
-    task_inner.task_start = get_time_ms();
     drop(task_inner);
     schedule(task_cx_ptr);
 }
@@ -130,11 +126,4 @@ pub fn current_add_signal(signal: SignalFlags) {
     let process = current_process();
     let mut process_inner = process.inner_exclusive_access();
     process_inner.signals |= signal;
-}
-
-pub fn set_task_prediction(pred: usize) {
-    current_task()
-        .unwrap()
-        .inner_exclusive_access()
-        .task_prediction = pred;
 }

@@ -2,7 +2,6 @@ use super::id::TaskUserRes;
 use super::{kstack_alloc, KernelStack, ProcessControlBlock, TaskContext};
 use crate::trap::TrapContext;
 use crate::{mm::PhysPageNum, sync::UPSafeCell};
-use crate::config::MAX_PRED;
 use alloc::sync::{Arc, Weak};
 use core::cell::RefMut;
 use core::f32::MAX_10_EXP;
@@ -68,7 +67,7 @@ impl TaskControlBlock {
                     task_cx: TaskContext::goto_trap_return(kstack_top),
                     task_status: TaskStatus::Ready,
                     exit_code: None,
-                    task_prediction: MAX_PRED,
+                    task_prediction: 0,
                     task_start: 0,
                 })
             },
