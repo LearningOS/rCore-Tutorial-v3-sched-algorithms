@@ -127,3 +127,9 @@ pub fn current_add_signal(signal: SignalFlags) {
     let mut process_inner = process.inner_exclusive_access();
     process_inner.signals |= signal;
 }
+
+pub fn set_app_priority(_pri : usize) {
+    let task = take_current_task().unwrap();
+    let mut task_inner = task.inner_exclusive_access();
+    task_inner.task_priority = _pri;
+}

@@ -1,11 +1,19 @@
 use super::{ProcessControlBlock, TaskControlBlock};
 use crate::sync::UPSafeCell;
+use crate::timer::get_time;
+use alloc::collections::btree_map::Values;
 use alloc::collections::{BTreeMap, VecDeque};
 use alloc::sync::Arc;
+use alloc::vec::Vec;
 use lazy_static::*;
+use crate::config::TICKET_X;
+use rand::prelude::*;
+use rand_isaac::Isaac64Rng;
 
 pub struct TaskManager {
     ready_queue: VecDeque<Arc<TaskControlBlock>>,
+    total_counts: usize,
+    lottery_array: Vec<usize>,
 }
 
 /// A simple FIFO scheduler.
@@ -13,12 +21,24 @@ impl TaskManager {
     pub fn new() -> Self {
         Self {
             ready_queue: VecDeque::new(),
+            total_counts: 0,
+            lottery_array: Vec::new(),
         }
     }
     pub fn add(&mut self, task: Arc<TaskControlBlock>) {
+        self.total_counts += task.inner_exclusive_access().task_priority * TICKET_X;
+        self.lottery_array.push(self.total_counts);
         self.ready_queue.push_back(task);
     }
     pub fn fetch(&mut self) -> Option<Arc<TaskControlBlock>> {
+        let mut rng = Isaac64Rng::seed_from_u64(get_time() as u64);
+        let lucky_dog =  rng.gen_range(0..self.total_counts);
+        for (ind, &val) in self.lottery_array.iter().enumerate(){
+            if val > lucky_dog{
+                self.lottery_array.remove(ind);
+                return self.ready_queue.remove(ind);
+            }
+        }
         self.ready_queue.pop_front()
     }
 }
