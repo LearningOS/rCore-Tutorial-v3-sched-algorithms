@@ -32,8 +32,13 @@ pub struct TaskControlBlockInner {
     pub task_cx: TaskContext,
     pub task_status: TaskStatus,
     pub exit_code: Option<i32>,
+<<<<<<< Updated upstream
     pub task_prediction: usize,
     pub task_start: usize,
+=======
+    pub task_stride: usize,
+    pub task_priority: usize,
+>>>>>>> Stashed changes
 }
 
 impl TaskControlBlockInner {
@@ -67,8 +72,13 @@ impl TaskControlBlock {
                     task_cx: TaskContext::goto_trap_return(kstack_top),
                     task_status: TaskStatus::Ready,
                     exit_code: None,
+<<<<<<< Updated upstream
                     task_prediction: 0,
                     task_start: 0,
+=======
+                    task_stride: 0,
+                    task_priority: 16,
+>>>>>>> Stashed changes
                 })
             },
         }
