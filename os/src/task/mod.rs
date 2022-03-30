@@ -133,7 +133,8 @@ pub fn current_add_signal(signal: SignalFlags) {
 }
 
 pub fn set_app_priority(_pri : usize) {
-    let task = take_current_task().unwrap();
+    let task = current_task().unwrap();
     let mut task_inner = task.inner_exclusive_access();
     task_inner.task_priority = _pri;
+    drop(task_inner);
 }
