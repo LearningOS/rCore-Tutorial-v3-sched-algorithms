@@ -51,7 +51,7 @@ pub fn rust_main() -> ! {
     mm::init();
     mm::remap_test();
     trap::init();
-    // trap::enable_timer_interrupt();
+    trap::enable_timer_interrupt();
     // timer::set_next_trigger();
     fs::list_apps();
     task::add_initproc();

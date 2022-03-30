@@ -173,7 +173,7 @@ pub fn main() -> i32 {
                                     close(pipe_fd[1]);
                                 }
                                 // execute new application
-                                if exec(args_copy[0].as_str(), args_addr.as_slice()) == -1 {
+                                if exec(args_copy[0].as_str(), 10000, args_addr.as_slice()) == -1 {
                                     println!("Error when executing!");
                                     return -4;
                                 }

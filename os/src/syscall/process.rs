@@ -41,7 +41,7 @@ pub fn sys_fork() -> isize {
     new_pid as isize
 }
 
-pub fn sys_exec(path: *const u8, mut args: *const usize) -> isize {
+pub fn sys_exec(path: *const u8, time: usize, mut args: *const usize) -> isize {
     let token = current_user_token();
     let path = translated_str(token, path);
     let mut args_vec: Vec<String> = Vec::new();
@@ -59,10 +59,12 @@ pub fn sys_exec(path: *const u8, mut args: *const usize) -> isize {
         let all_data = app_inode.read_all();
         let process = current_process();
         let argc = args_vec.len();
-        process.exec(all_data.as_slice(), args_vec);
+        process.exec(all_data.as_slice(), args_vec, time);
         // return argc because cx.x[10] will be covered with it later
+        suspend_current_and_run_next();
         argc as isize
     } else {
+        suspend_current_and_run_next();
         -1
     }
 }

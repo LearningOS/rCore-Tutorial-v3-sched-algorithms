@@ -5,6 +5,7 @@ use crate::{mm::PhysPageNum, sync::UPSafeCell};
 use alloc::sync::{Arc, Weak};
 use core::cell::RefMut;
 use core::f32::MAX_10_EXP;
+use crate::config::INIT_RUNNING_TIME;
 
 pub struct TaskControlBlock {
     // immutable
@@ -33,6 +34,7 @@ pub struct TaskControlBlockInner {
     pub task_status: TaskStatus,
     pub exit_code: Option<i32>,
     pub task_prediction: usize,
+    // time:ms
 }
 
 impl TaskControlBlockInner {
@@ -66,7 +68,7 @@ impl TaskControlBlock {
                     task_cx: TaskContext::goto_trap_return(kstack_top),
                     task_status: TaskStatus::Ready,
                     exit_code: None,
-                    task_prediction: 0,
+                    task_prediction: INIT_RUNNING_TIME,
                 })
             },
         }

@@ -8,7 +8,6 @@ mod switch;
 #[allow(clippy::module_inception)]
 mod task;
 
-use crate::config::BIG_STRIDE;
 use crate::fs::{open_file, OpenFlags};
 use alloc::sync::Arc;
 use lazy_static::*;

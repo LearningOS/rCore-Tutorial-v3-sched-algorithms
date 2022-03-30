@@ -3,9 +3,11 @@
 
 #[macro_use]
 extern crate user_lib;
+use user_lib::{sleep};
 
 #[no_mangle]
 pub fn main() -> i32 {
-    println!("Hello world from user mode program!");
+    println!("I am sjf2");
+    sleep(100000);
     0
 }

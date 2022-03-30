@@ -3,21 +3,21 @@
 
 #[macro_use]
 extern crate user_lib;
-
-use user_lib::{get_time, sleep};
+use user_lib::{sleep,get_time};
 
 #[no_mangle]
 pub fn main() -> i32 {
-    println!("into sleep test!");
     let start = get_time();
+    print!("I am sjf3");
     println!("current time_msec = {}", start);
-    sleep(100);
+    for i in 1..100000{
+        print!(" ");
+    }
     let end = get_time();
     println!(
         "time_msec = {} after sleeping 100 ticks, delta = {}ms!",
         end,
         end - start
     );
-    println!("r_sleep passed!");
     0
 }
