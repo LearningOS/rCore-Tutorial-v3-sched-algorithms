@@ -2,7 +2,7 @@ use crate::fs::{open_file, OpenFlags};
 use crate::mm::{translated_ref, translated_refmut, translated_str};
 use crate::task::{
     current_process, current_task, current_user_token, exit_current_and_run_next, pid2process,
-    suspend_current_and_run_next, SignalFlags,
+    suspend_current_and_run_next, SignalFlags, set_task_isrunning,
 };
 use crate::timer::get_time_ms;
 use alloc::string::String;
@@ -15,6 +15,7 @@ pub fn sys_exit(exit_code: i32) -> ! {
 }
 
 pub fn sys_yield() -> isize {
+    set_task_isrunning(false);
     suspend_current_and_run_next();
     0
 }

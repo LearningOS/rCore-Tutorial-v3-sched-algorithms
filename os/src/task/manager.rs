@@ -18,6 +18,7 @@ impl TaskManager {
     pub fn add(&mut self, task: Arc<TaskControlBlock>) {
         let task_inner = task.inner_exclusive_access();
         let prediction = task_inner.task_prediction;
+        let running = task_inner.task_isrunning;
         // if prediction != 1000000{
         //     println!("{}", prediction);
         // }
@@ -25,7 +26,15 @@ impl TaskManager {
         for queue in 0..self.ready_queue.len(){
             let task1 = self.ready_queue.get_mut(queue).unwrap();
             let prediction1 = task1.inner_exclusive_access().task_prediction;
-            if prediction < prediction1 {
+            let running1 = task1.inner_exclusive_access().task_isrunning;
+            if running && !running1{
+                self.ready_queue.insert(queue, task);
+                return
+            }
+            else if !running && running1{
+                continue;
+            }
+            else if prediction < prediction1 {
                 // if prediction != 1000000{
                 //     println!("{},{}", prediction,prediction1);
                 // }

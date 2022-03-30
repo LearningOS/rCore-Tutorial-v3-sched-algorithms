@@ -127,3 +127,10 @@ pub fn current_add_signal(signal: SignalFlags) {
     let mut process_inner = process.inner_exclusive_access();
     process_inner.signals |= signal;
 }
+
+pub fn set_task_isrunning(status: bool){
+    let task = current_task().unwrap();
+    let mut task_inner = task.inner_exclusive_access();
+    task_inner.task_isrunning = status;
+    drop(task_inner);
+}
