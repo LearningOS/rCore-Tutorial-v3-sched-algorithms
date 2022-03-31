@@ -35,6 +35,8 @@ pub struct TaskControlBlockInner {
     pub exit_code: Option<i32>,
     pub task_prediction: usize,
     // time:ms
+    pub task_last_start_time: usize,
+    pub task_complete_time: usize,
 }
 
 impl TaskControlBlockInner {
@@ -69,6 +71,8 @@ impl TaskControlBlock {
                     task_status: TaskStatus::Ready,
                     exit_code: None,
                     task_prediction: INIT_RUNNING_TIME,
+                    task_last_start_time: 0,
+                    task_complete_time: INIT_RUNNING_TIME,
                 })
             },
         }
