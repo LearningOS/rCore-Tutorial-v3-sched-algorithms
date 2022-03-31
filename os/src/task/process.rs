@@ -8,6 +8,7 @@ use crate::mm::{translated_refmut, MemorySet, KERNEL_SPACE};
 use crate::sync::{Condvar, Mutex, Semaphore, UPSafeCell};
 use crate::timer::get_time_ms;
 use crate::trap::{trap_handler, TrapContext};
+use crate::config::FORK_DELAY;
 use alloc::string::String;
 use alloc::sync::{Arc, Weak};
 use alloc::vec;
@@ -146,7 +147,7 @@ impl ProcessControlBlock {
         let task = self.inner_exclusive_access().get_task(0);
         let mut task_inner = task.inner_exclusive_access();
         task_inner.task_prediction = time;
-        task_inner.task_complete_time = time;
+        task_inner.task_complete_time = time as isize;
         task_inner.task_last_start_time = get_time_ms();
         task_inner.res.as_mut().unwrap().ustack_base = ustack_base;
         task_inner.res.as_mut().unwrap().alloc_user_res();
@@ -248,12 +249,12 @@ impl ProcessControlBlock {
         drop(child_inner);
         // modify kstack_top in trap_cx of this thread
         let mut task_inner = task.inner_exclusive_access();
-        task_inner.task_prediction = parent
-        .get_task(0)
-        .inner_exclusive_access().task_prediction;
-        task_inner.task_complete_time = parent
-        .get_task(0)
-        .inner_exclusive_access().task_complete_time;
+        let parent_task = parent
+        .get_task(0);
+        let parent_inner = parent_task.inner_exclusive_access();
+        task_inner.task_prediction = parent_inner.task_prediction;
+        // println!("{},{}", parent_inner.task_last_start_time, get_time_ms());
+        task_inner.task_complete_time = parent_inner.task_complete_time - (get_time_ms() - parent_inner.task_last_start_time + FORK_DELAY) as isize;
         let trap_cx = task_inner.get_trap_cx();
         trap_cx.kernel_sp = task.kstack.get_top();
         drop(task_inner);

@@ -36,7 +36,7 @@ pub struct TaskControlBlockInner {
     pub task_prediction: usize,
     // time:ms
     pub task_last_start_time: usize,
-    pub task_complete_time: usize,
+    pub task_complete_time: isize,
 }
 
 impl TaskControlBlockInner {
@@ -72,7 +72,7 @@ impl TaskControlBlock {
                     exit_code: None,
                     task_prediction: INIT_RUNNING_TIME,
                     task_last_start_time: 0,
-                    task_complete_time: INIT_RUNNING_TIME,
+                    task_complete_time: INIT_RUNNING_TIME as isize,
                 })
             },
         }

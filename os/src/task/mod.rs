@@ -35,7 +35,7 @@ pub fn suspend_current_and_run_next() {
     let task_cx_ptr = &mut task_inner.task_cx as *mut TaskContext;
     // Change status to Ready
     task_inner.task_status = TaskStatus::Ready;
-    task_inner.task_complete_time -= get_time_ms() - task_inner.task_last_start_time;
+    task_inner.task_complete_time -= (get_time_ms() - task_inner.task_last_start_time) as isize;
     drop(task_inner);
     // ---- release current TCB
 
@@ -50,7 +50,7 @@ pub fn block_current_and_run_next() {
     let mut task_inner = task.inner_exclusive_access();
     let task_cx_ptr = &mut task_inner.task_cx as *mut TaskContext;
     task_inner.task_status = TaskStatus::Blocking;
-    task_inner.task_complete_time -= get_time_ms() - task_inner.task_last_start_time;
+    task_inner.task_complete_time -= (get_time_ms() - task_inner.task_last_start_time) as isize;
     drop(task_inner);
     schedule(task_cx_ptr);
 }

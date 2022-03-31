@@ -75,8 +75,10 @@ pub fn trap_handler() -> ! {
         }
         Trap::Interrupt(Interrupt::SupervisorTimer) => {
             set_next_trigger();
-            check_timer();
-            suspend_current_and_run_next();
+            if check_timer(){
+                suspend_current_and_run_next();
+            }
+
         }
         _ => {
             panic!(
