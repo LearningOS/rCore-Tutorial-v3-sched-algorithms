@@ -18,7 +18,7 @@ static TIMES: [usize;4] = [
     100,
 ];
 
-use user_lib::{exec, fork, sleep};
+use user_lib::{exec, fork, sleep, get_time};
 
 #[no_mangle]
 pub fn main() -> i32 {
@@ -26,8 +26,10 @@ pub fn main() -> i32 {
     for test in TESTS {     
         if(i == 3){
             sleep(1000);
+            let start = get_time();
+            println!("sjf4 time_msec = {}", start);
         }
-        println!("Usertests: Running {}", test);
+        println!("{} Arrive", test);
         let pid = fork();
         if pid == 0 {
             exec(*test, TIMES[i], &[core::ptr::null::<u8>()]);
@@ -35,6 +37,5 @@ pub fn main() -> i32 {
         }
         i += 1;
     }
-    println!("Usertests passed!");
     0
 }
