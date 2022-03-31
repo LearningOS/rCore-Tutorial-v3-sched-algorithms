@@ -144,7 +144,7 @@ impl ProcessControlBlock {
         // since memory_set has been changed
         let task = self.inner_exclusive_access().get_task(0);
         let mut task_inner = task.inner_exclusive_access();
-        task_inner.task_prediction = time;
+        task_inner.task_period = time;
         task_inner.res.as_mut().unwrap().ustack_base = ustack_base;
         task_inner.res.as_mut().unwrap().alloc_user_res();
         task_inner.trap_cx_ppn = task_inner.res.as_mut().unwrap().trap_cx_ppn();
@@ -245,9 +245,9 @@ impl ProcessControlBlock {
         drop(child_inner);
         // modify kstack_top in trap_cx of this thread
         let mut task_inner = task.inner_exclusive_access();
-        task_inner.task_prediction = parent
+        task_inner.task_period = parent
         .get_task(0)
-        .inner_exclusive_access().task_prediction;
+        .inner_exclusive_access().task_period;
         let trap_cx = task_inner.get_trap_cx();
         trap_cx.kernel_sp = task.kstack.get_top();
         drop(task_inner);

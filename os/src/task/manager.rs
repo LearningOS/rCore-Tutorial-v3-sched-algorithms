@@ -1,5 +1,6 @@
 use super::{ProcessControlBlock, TaskControlBlock};
 use crate::sync::UPSafeCell;
+use crate::timer::get_time_ms;
 use alloc::collections::{BTreeMap, VecDeque};
 use alloc::sync::Arc;
 use lazy_static::*;
@@ -17,15 +18,16 @@ impl TaskManager {
     }
     pub fn add(&mut self, task: Arc<TaskControlBlock>) {
         let task_inner = task.inner_exclusive_access();
-        let prediction = task_inner.task_prediction;
+        let period = task_inner.task_period;
         // if prediction != 1000000{
         //     println!("{}", prediction);
         // }
         drop(task_inner);
+        //println!("{}, {}", period, get_time_ms());
         for queue in 0..self.ready_queue.len(){
             let task1 = self.ready_queue.get_mut(queue).unwrap();
-            let prediction1 = task1.inner_exclusive_access().task_prediction;
-            if prediction < prediction1 {
+            let period1 = task1.inner_exclusive_access().task_period;
+            if period < period1 {
                 // if prediction != 1000000{
                 //     println!("{},{}", prediction,prediction1);
                 // }

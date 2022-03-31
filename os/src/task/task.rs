@@ -33,7 +33,7 @@ pub struct TaskControlBlockInner {
     pub task_cx: TaskContext,
     pub task_status: TaskStatus,
     pub exit_code: Option<i32>,
-    pub task_prediction: usize,
+    pub task_period: usize,
     // time:ms
 }
 
@@ -68,7 +68,7 @@ impl TaskControlBlock {
                     task_cx: TaskContext::goto_trap_return(kstack_top),
                     task_status: TaskStatus::Ready,
                     exit_code: None,
-                    task_prediction: INIT_RUNNING_TIME,
+                    task_period: INIT_RUNNING_TIME,
                 })
             },
         }
