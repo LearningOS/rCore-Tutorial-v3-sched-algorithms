@@ -8,7 +8,7 @@ mod switch;
 #[allow(clippy::module_inception)]
 mod task;
 
-use crate::fs::{open_file, OpenFlags};
+use crate::{fs::{open_file, OpenFlags}, timer::get_time_ms};
 use alloc::sync::Arc;
 use lazy_static::*;
 use manager::fetch_task;
@@ -34,6 +34,7 @@ pub fn suspend_current_and_run_next() {
     let task_cx_ptr = &mut task_inner.task_cx as *mut TaskContext;
     // Change status to Ready
     task_inner.task_status = TaskStatus::Ready;
+    task_inner.task_last_yield_time = get_time_ms();
     drop(task_inner);
     // ---- release current TCB
 
@@ -48,6 +49,7 @@ pub fn block_current_and_run_next() {
     let mut task_inner = task.inner_exclusive_access();
     let task_cx_ptr = &mut task_inner.task_cx as *mut TaskContext;
     task_inner.task_status = TaskStatus::Blocking;
+    task_inner.task_last_yield_time = get_time_ms();
     drop(task_inner);
     schedule(task_cx_ptr);
 }

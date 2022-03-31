@@ -1,5 +1,6 @@
 use super::id::TaskUserRes;
 use super::{kstack_alloc, KernelStack, ProcessControlBlock, TaskContext};
+use crate::timer::get_time_ms;
 use crate::trap::TrapContext;
 use crate::{mm::PhysPageNum, sync::UPSafeCell};
 use alloc::sync::{Arc, Weak};
@@ -36,6 +37,8 @@ pub struct TaskControlBlockInner {
     pub task_prediction: usize,
     // time:ms
     pub task_isrunning: bool,
+    pub task_last_yield_time: usize,
+    pub task_waiting_time: usize,
 }
 
 impl TaskControlBlockInner {
@@ -71,6 +74,8 @@ impl TaskControlBlock {
                     exit_code: None,
                     task_prediction: INIT_RUNNING_TIME,
                     task_isrunning: false,
+                    task_last_yield_time: get_time_ms(),
+                    task_waiting_time: 1,
                 })
             },
         }

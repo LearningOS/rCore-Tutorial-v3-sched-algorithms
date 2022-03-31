@@ -1,5 +1,6 @@
 use super::{ProcessControlBlock, TaskControlBlock};
 use crate::sync::UPSafeCell;
+use crate::timer::get_time_ms;
 use alloc::collections::{BTreeMap, VecDeque};
 use alloc::sync::Arc;
 use lazy_static::*;
@@ -19,14 +20,19 @@ impl TaskManager {
         let task_inner = task.inner_exclusive_access();
         let prediction = task_inner.task_prediction;
         let running = task_inner.task_isrunning;
+        let waiting_time = task_inner.task_waiting_time + get_time_ms() - task_inner.task_last_yield_time;
         // if prediction != 1000000{
         //     println!("{}", prediction);
         // }
         drop(task_inner);
         for queue in 0..self.ready_queue.len(){
-            let task1 = self.ready_queue.get_mut(queue).unwrap();
-            let prediction1 = task1.inner_exclusive_access().task_prediction;
-            let running1 = task1.inner_exclusive_access().task_isrunning;
+            let task1 = self.ready_queue.get(queue).unwrap();
+            let task1_inner = task1.inner_exclusive_access();
+            let prediction1 = task1_inner.task_prediction;
+            let running1 = task1_inner.task_isrunning;
+            let waiting_time1 = task1_inner.task_waiting_time + get_time_ms() - task1_inner.task_last_yield_time;
+            drop(task1_inner);
+            // println!("{}, {}, {}", running, queue, running1);
             if running && !running1{
                 self.ready_queue.insert(queue, task);
                 return
@@ -34,12 +40,12 @@ impl TaskManager {
             else if !running && running1{
                 continue;
             }
-            else if prediction < prediction1 {
-                // if prediction != 1000000{
-                //     println!("{},{}", prediction,prediction1);
-                // }
-                self.ready_queue.insert(queue, task);
-                return
+            else{
+                // println!("1 {},{}, 2 {},{}", prediction, waiting_time, prediction1, waiting_time1);
+                if (waiting_time * prediction1) > (waiting_time1 * prediction) {
+                    self.ready_queue.insert(queue, task);
+                    return
+                }
             }
         }
         self.ready_queue.push_back(task);

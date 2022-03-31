@@ -15,7 +15,7 @@ static TIMES: [usize;4] = [
     10000,
     100000,
     1000,
-    100,
+    500,
 ];
 
 use user_lib::{exec, fork, sleep, get_time};
@@ -24,8 +24,8 @@ use user_lib::{exec, fork, sleep, get_time};
 pub fn main() -> i32 {
     let mut i = 0;
     for test in TESTS {     
-        if(i == 3){
-            sleep(1000);
+        if i == 3 {
+            sleep(500);
             let start = get_time();
             println!("sjf4 time_msec = {}", start);
         }
