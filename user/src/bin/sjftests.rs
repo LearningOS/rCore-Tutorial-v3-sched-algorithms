@@ -24,12 +24,11 @@ use user_lib::{exec, fork, sleep, get_time};
 pub fn main() -> i32 {
     let mut i = 0;
     for test in TESTS {     
-        if(i == 3){
-            sleep(1000);
-            let start = get_time();
-            println!("sjf4 time_msec = {}", start);
+        if i == 3{
+            sleep(500);
         }
-        println!("{} Arrive", test);
+        let start = get_time();
+        println!("{} Arrive at {}", test, start);
         let pid = fork();
         if pid == 0 {
             exec(*test, TIMES[i], &[core::ptr::null::<u8>()]);
