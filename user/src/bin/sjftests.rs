@@ -28,10 +28,9 @@ pub fn main() -> i32 {
     for test in TESTS { 
         if i == 3 || i == 4{
             sleep(300);
-            let start = get_time();
-            println!("current time_msec = {}", start);
         }
-        println!("{} Arrive", test);
+        let start = get_time();
+        println!("{} Arrive at {}", test, start);
         let pid = fork();
         if pid == 0 {
             exec(*test, TIMES[i], &[core::ptr::null::<u8>()]);
