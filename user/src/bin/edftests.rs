@@ -5,18 +5,21 @@
 extern crate user_lib;
 
 static TESTS: &[&str] = &[
-    "rms1\0",
-    "rms2\0",
+    "edf1\0",
+    "edf2\0",
+    "edf3\0",
 ];
 
-// static TIMES: [usize;2] = [
+// static TIMES: [usize;3] = [
 //     800,
 //     500,
+//     400
 // ];
 
-static PERIODS: [usize; 2] = [
-    2000,
+static DEADLINES: [usize; 3] = [
     1000,
+    2000,
+    800,
 ];
 
 use user_lib::{exec, fork, get_time, sleep};
@@ -25,10 +28,13 @@ use user_lib::{exec, fork, get_time, sleep};
 pub fn main() -> i32 {
     let mut i = 0;
     for test in TESTS {
+        if i == 2{
+            sleep(1000);
+        }
         println!("{} Arriving at {}", test, get_time());
         let pid = fork();
         if pid == 0 {
-            exec(*test, PERIODS[i], &[core::ptr::null::<u8>()]);
+            exec(*test, DEADLINES[i], &[core::ptr::null::<u8>()]);
             panic!("unreachable!");
         }
         i += 1;

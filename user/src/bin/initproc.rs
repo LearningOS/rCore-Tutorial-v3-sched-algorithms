@@ -1,7 +1,6 @@
 #![no_std]
 #![no_main]
 
-#[macro_use]
 extern crate user_lib;
 
 use user_lib::{exec, fork, wait, yield_};
@@ -9,7 +8,7 @@ use user_lib::{exec, fork, wait, yield_};
 #[no_mangle]
 fn main() -> i32 {
     if fork() == 0 {
-        exec("rmstests\0", 1, &[core::ptr::null::<u8>()]);
+        exec("edftests\0", 1, &[core::ptr::null::<u8>()]);
     } else {
         loop {
             let mut exit_code: i32 = 0;

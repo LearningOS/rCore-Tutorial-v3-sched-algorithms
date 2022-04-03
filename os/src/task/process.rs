@@ -1,11 +1,12 @@
 use super::id::RecycleAllocator;
 use super::manager::insert_into_pid2process;
 use super::TaskControlBlock;
-use super::{add_task, SignalFlags, suspend_current_and_run_next};
+use super::{add_task, SignalFlags};
 use super::{pid_alloc, PidHandle};
 use crate::fs::{File, Stdin, Stdout};
 use crate::mm::{translated_refmut, MemorySet, KERNEL_SPACE};
 use crate::sync::{Condvar, Mutex, Semaphore, UPSafeCell};
+use crate::timer::get_time_ms;
 use crate::trap::{trap_handler, TrapContext};
 use alloc::string::String;
 use alloc::sync::{Arc, Weak};
@@ -144,7 +145,7 @@ impl ProcessControlBlock {
         // since memory_set has been changed
         let task = self.inner_exclusive_access().get_task(0);
         let mut task_inner = task.inner_exclusive_access();
-        task_inner.task_period = time;
+        task_inner.task_deadline = get_time_ms() + time;
         task_inner.res.as_mut().unwrap().ustack_base = ustack_base;
         task_inner.res.as_mut().unwrap().alloc_user_res();
         task_inner.trap_cx_ppn = task_inner.res.as_mut().unwrap().trap_cx_ppn();
@@ -245,9 +246,9 @@ impl ProcessControlBlock {
         drop(child_inner);
         // modify kstack_top in trap_cx of this thread
         let mut task_inner = task.inner_exclusive_access();
-        task_inner.task_period = parent
+        task_inner.task_deadline = parent
         .get_task(0)
-        .inner_exclusive_access().task_period;
+        .inner_exclusive_access().task_deadline;
         let trap_cx = task_inner.get_trap_cx();
         trap_cx.kernel_sp = task.kstack.get_top();
         drop(task_inner);
