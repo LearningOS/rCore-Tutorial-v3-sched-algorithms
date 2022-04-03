@@ -24,7 +24,7 @@ impl TaskManager {
         }
     }
     pub fn add(&mut self, task: Arc<TaskControlBlock>) {
-        let mut task_inner = task.inner_exclusive_access();
+        let task_inner = task.inner_exclusive_access();
         let priority = task_inner.task_priority;
         drop(task_inner);
         if priority == 0{
