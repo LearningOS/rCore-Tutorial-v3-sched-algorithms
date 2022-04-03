@@ -14,18 +14,17 @@ pub fn main() -> i32 {
     let mut b: usize = 1;
     let mut c:usize = 0;
     for i in 0..400000000{
-        if i == 300000000{
-            println!("yield");
-            yield_();
-        }
         c = (a + b) % 1000007;
         a = b;
-        b = c;    
+        b = c; 
+        if i % 100000000 == 0{
+            println!("sjf3 running...");
+        }
     }
     println!("{}",c);
     let end = get_time();
     println!(
-        "time_msec = {} after sleeping 100 ticks, delta = {}ms!",
+        "time_msec = {}, delta = {}ms!",
         end,
         end - start
     );
