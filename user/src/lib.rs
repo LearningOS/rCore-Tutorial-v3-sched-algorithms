@@ -197,3 +197,7 @@ pub fn condvar_signal(condvar_id: usize) {
 pub fn condvar_wait(condvar_id: usize, mutex_id: usize) {
     sys_condvar_wait(condvar_id, mutex_id);
 }
+
+pub fn set_priority(prio: isize) -> isize {
+    sys_set_priority(prio)
+}

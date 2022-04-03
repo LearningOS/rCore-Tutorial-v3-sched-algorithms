@@ -1,4 +1,5 @@
 use super::{ProcessControlBlock, TaskControlBlock};
+use crate::console::print;
 use crate::sync::UPSafeCell;
 use crate::timer::get_time;
 use alloc::collections::btree_map::Values;
@@ -27,15 +28,19 @@ impl TaskManager {
     }
     pub fn add(&mut self, task: Arc<TaskControlBlock>) {
         self.total_counts += task.inner_exclusive_access().task_priority * TICKET_X;
-        self.lottery_array.push(self.total_counts);
+        self.lottery_array.push(task.inner_exclusive_access().task_priority);
         self.ready_queue.push_back(task);
     }
     pub fn fetch(&mut self) -> Option<Arc<TaskControlBlock>> {
         let mut rng = Isaac64Rng::seed_from_u64(get_time() as u64);
         let lucky_dog =  rng.gen_range(0..self.total_counts);
+        //println!("{}",lucky_dog);
+        let mut tmp_sum = 0;
         for (ind, &val) in self.lottery_array.iter().enumerate(){
-            if val > lucky_dog{
+            tmp_sum += val * TICKET_X;
+            if tmp_sum > lucky_dog{
                 self.lottery_array.remove(ind);
+                self.total_counts -= val * TICKET_X;
                 return self.ready_queue.remove(ind);
             }
         }
