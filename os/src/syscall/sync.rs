@@ -132,3 +132,14 @@ pub fn sys_condvar_wait(condvar_id: usize, mutex_id: usize) -> isize {
     condvar.wait(mutex);
     0
 }
+
+pub fn sys_cycle(period: usize) -> isize {
+    let task = current_task().unwrap();
+    let mut task_inner = task.inner_exclusive_access();
+    let expire_ms = task_inner.task_deadline;
+    task_inner.task_deadline += period;
+    drop(task_inner);
+    add_timer(expire_ms, task);
+    block_current_and_run_next();
+    0
+}

@@ -8,18 +8,27 @@ static TESTS: &[&str] = &[
     "edf1\0",
     "edf2\0",
     "edf3\0",
+    "edf4\0",
+    "rms1\0",
+    "rms2\0",
 ];
 
 // static TIMES: [usize;3] = [
 //     800,
 //     500,
-//     400
+//     300
+//     300,
+//     800,
+//     500,
 // ];
 
-static DEADLINES: [usize; 3] = [
+static DEADLINES: [usize; 6] = [
     1000,
+    1500,
     2000,
     800,
+    1500,
+    1200,
 ];
 
 use user_lib::{exec, fork, get_time, sleep};
@@ -28,8 +37,11 @@ use user_lib::{exec, fork, get_time, sleep};
 pub fn main() -> i32 {
     let mut i = 0;
     for test in TESTS {
-        if i == 2{
+        if i == 3{
             sleep(1000);
+        }
+        if i == 4{
+            sleep(2000);
         }
         println!("{} Arriving at {}", test, get_time());
         let pid = fork();

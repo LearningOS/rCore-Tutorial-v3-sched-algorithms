@@ -197,3 +197,7 @@ pub fn condvar_signal(condvar_id: usize) {
 pub fn condvar_wait(condvar_id: usize, mutex_id: usize) {
     sys_condvar_wait(condvar_id, mutex_id);
 }
+
+pub fn cycle(period_ms: usize) {
+    sys_cycle(period_ms);
+}

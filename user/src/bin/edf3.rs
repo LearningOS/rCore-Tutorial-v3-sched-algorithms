@@ -5,8 +5,8 @@
 extern crate user_lib;
 use user_lib::get_time;
 
-// const PERIOD: isize = 800;
-// const TIME: isize = 400;
+// const PERIOD: isize = 2000;
+// const TIME: isize = 300;
 const INIT: isize = 120;
 
 #[no_mangle]
@@ -16,7 +16,7 @@ pub fn main() -> i32 {
     let mut a: usize = 1;
     let mut b: usize = 1;
     let mut c:usize = 0;
-    for _i in 0..160000000{
+    for _i in 0..120000000{
         c = (a + b) % 1000007;
         a = b;
         b = c;    
