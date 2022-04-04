@@ -59,15 +59,17 @@ pub fn add_timer(expire_ms: usize, task: Arc<TaskControlBlock>) {
     timers.push(TimerCondVar { expire_ms, task });
 }
 
-pub fn check_timer() {
+pub fn check_timer() -> bool{
     let current_ms = get_time_ms();
     let mut timers = TIMERS.exclusive_access();
     while let Some(timer) = timers.peek() {
         if timer.expire_ms <= current_ms {
             add_task(Arc::clone(&timer.task));
             timers.pop();
+            return true;
         } else {
             break;
         }
     }
+    false
 }

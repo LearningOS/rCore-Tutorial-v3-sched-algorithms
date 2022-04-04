@@ -5,12 +5,12 @@
 extern crate user_lib;
 use user_lib::{get_time, sleep};
 
-const PERIOD: isize = 1000;
+const PERIOD: isize = 1200;
 const INIT: isize = 120;
 
 #[no_mangle]
 pub fn main() -> i32 {
-    for j in 0..3{
+    for j in 0..5{
         let start = get_time() - INIT;
         println!("current time_msec = {}, I am rms2", start);
         let mut a: usize = 1;

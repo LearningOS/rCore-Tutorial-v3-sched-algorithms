@@ -1,6 +1,5 @@
 use super::{ProcessControlBlock, TaskControlBlock};
 use crate::sync::UPSafeCell;
-use crate::timer::get_time_ms;
 use alloc::collections::{BTreeMap, VecDeque};
 use alloc::sync::Arc;
 use lazy_static::*;
@@ -9,7 +8,7 @@ pub struct TaskManager {
     ready_queue: VecDeque<Arc<TaskControlBlock>>,
 }
 
-/// A simple SPN scheduler.
+/// A simple RMS scheduler.
 impl TaskManager {
     pub fn new() -> Self {
         Self {
@@ -19,8 +18,8 @@ impl TaskManager {
     pub fn add(&mut self, task: Arc<TaskControlBlock>) {
         let task_inner = task.inner_exclusive_access();
         let period = task_inner.task_period;
-        // if prediction != 1000000{
-        //     println!("{}", prediction);
+        // if period != 1000000{
+        //     println!("{}", period);
         // }
         drop(task_inner);
         //println!("{}, {}", period, get_time_ms());

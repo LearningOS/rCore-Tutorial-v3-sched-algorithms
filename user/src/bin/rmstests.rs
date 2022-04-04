@@ -15,11 +15,11 @@ static TESTS: &[&str] = &[
 // ];
 
 static PERIODS: [usize; 2] = [
-    2000,
-    1000,
+    1500,
+    1200,
 ];
 
-use user_lib::{exec, fork, get_time, sleep};
+use user_lib::{exec, fork, get_time};
 
 #[no_mangle]
 pub fn main() -> i32 {

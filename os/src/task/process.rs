@@ -1,7 +1,7 @@
 use super::id::RecycleAllocator;
 use super::manager::insert_into_pid2process;
 use super::TaskControlBlock;
-use super::{add_task, SignalFlags, suspend_current_and_run_next};
+use super::{add_task, SignalFlags};
 use super::{pid_alloc, PidHandle};
 use crate::fs::{File, Stdin, Stdout};
 use crate::mm::{translated_refmut, MemorySet, KERNEL_SPACE};
