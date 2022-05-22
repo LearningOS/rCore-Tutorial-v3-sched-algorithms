@@ -9,7 +9,7 @@ use alloc::vec::Vec;
 use lazy_static::*;
 use crate::config::TICKET_X;
 use rand::prelude::*;
-use rand_isaac::Isaac64Rng;
+use rand_chacha::ChaCha20Rng;
 
 pub struct TaskManager {
     ready_queue: VecDeque<Arc<TaskControlBlock>>,
@@ -32,7 +32,7 @@ impl TaskManager {
         self.ready_queue.push_back(task);
     }
     pub fn fetch(&mut self) -> Option<Arc<TaskControlBlock>> {
-        let mut rng = Isaac64Rng::seed_from_u64(get_time() as u64);
+        let mut rng = ChaCha20Rng::seed_from_u64(get_time() as u64);
         let lucky_dog =  rng.gen_range(0..self.total_counts);
         //println!("{}",lucky_dog);
         let mut tmp_sum = 0;
